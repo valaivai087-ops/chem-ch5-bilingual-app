@@ -54,6 +54,7 @@ const termZh={"Chapter":"章、章節","Thermochemistry":"熱化學","Thermodyna
 function translateLine(line){let s=line.replace(/|||▪|•/g," ").replace(/\s+/g," ").trim();if(!s)return "";let hits=[];Object.keys(termZh).sort((a,b)=>b.length-a.length).forEach(k=>{const sym=/^(q|w|H|U|P|V|T|J|kJ|PV|Cs|Ccal|qrxn|qcal|ΔE|∆E|ΔU|∆U|ΔH|∆H)$/.test(k); const ok=sym?new RegExp(`(^|[^A-Za-z])${k.replace(/[.*+?^${}()|[\\]\\]/g,"\\$&")}(?=$|[^A-Za-z])`).test(s):s.includes(k); if(ok&&!hits.includes(termZh[k]))hits.push(termZh[k])});let zh=s;const reps=[["Energy is the ability to do work or transfer heat","能量就是可以做功或把熱傳出去的能力"],["energy cannot be created or destroyed","能量不會憑空產生，也不會消失"],["converted between different forms","只會在不同形式之間轉換"],["A positive","正號表示系統拿到能量"],["A negative","負號表示系統失去能量"],["The system includes","系統就是我們指定要研究的那一部分"],["surroundings are everything else","外界就是系統以外的所有東西"],["State is determined by","狀態由物質種類、數量、結構和條件決定"],["q and w are not state functions","q 和 w 不是狀態函數，會受路徑影響"],["Heat is energy transfer","熱是能量轉移"],["caused by a temperature difference","原因是有溫度差"],["Work is an energy transfer","功也是能量轉移"],["force moving through a distance","是力推著東西移動一段距離"],["Enthalpy is the sum","焓是內能加上壓力體積項"],["constant pressure","定壓"],["exothermic reactions","放熱反應"],["endothermic reactions","吸熱反應"],["change in enthalpy","焓變、反應熱"],["heat capacity","熱容量"],["specific heat","比熱"],["Hess’s law states","赫斯定律說"],["series of steps","反應可以拆成好幾步"],["sum of the enthalpy changes","總焓變等於各步焓變相加"],["bond enthalpy is always positive","鍵焓通常是正值，因為斷鍵要吸收能量"],["Energy in Foods","食物中的能量"],["Fuel Values","燃料值、食物熱量值"]];reps.forEach(([en,tw])=>{if(s.includes(en))zh=tw});if(zh===s){zh=hits.length?`白話：這行在講 ${hits.slice(0,4).join("、")}。`:`白話：這行是本頁的英文重點，請搭配右側概念一起看。`;}if(hits.length)zh+=`；關鍵字：${hits.slice(0,6).join("、")}。`;return zh}
 function overlayLinesForPage(){const raw=(pageOriginalText[currentPage-1]||"").split(/\n+/).map(x=>x.trim()).filter(Boolean);const english=raw.filter(x=>/[A-Za-zΔ∆]/.test(x)).slice(0,18);return english.length?english:raw.slice(0,12)}
 function pageOverlayText(d){const lines=overlayLinesForPage();return `<div class="overlayTitle">本頁圖上英文逐句口語中文翻譯｜原英文保留在左，中文在右</div>`+lines.map(line=>`<div class="overlayLine"><div class="overlayEn">${esc(line)}</div><div class="overlayZh">${esc(translateLine(line))}<span class="overlayChem">公式/符號也一起翻：ΔH=焓變，q=熱，w=功，U=內能，H=焓。</span></div></div>`).join("")}
+function pageQuiz(d){return [[`本頁圖上的英文原文，最核心是在講什麼？`,[d.title,"只是在裝飾","與熱化學無關","不用看原文"],0,`本頁主題是 ${d.title}。`],[`本頁第一性原理是什麼？`,[d.first,"只背圖片位置","不需要系統邊界","跳過正負號"],0,d.first],[`本頁最口語的記憶鉤子？`,[d.hook,"所有英文都不用翻","只看第一頁","不要看公式符號"],0,d.hook]]}
 function renderPageSections(d){
   const pageNo=currentPage;
   $("treeBody").innerHTML=[`本頁主題：${d.title}`,`核心原理：${d.first}`,`口語翻譯：${d.zh}`,`記憶鉤子：${d.hook}`].map((x,i)=>`<div class="treeItem"><b>${String.fromCharCode(65+i)}.</b> ${esc(x)}</div>`).join("");
@@ -76,6 +77,7 @@ renderStatic();bindEvents();renderPage();
 </script>
 </body>
 </html>
+
 
 
 
